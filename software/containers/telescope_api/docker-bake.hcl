@@ -66,6 +66,21 @@ target "image-armv7" {
   cache-to = ["type=gha,mode=max"]
 }
 
+target "image-armv7-local" {
+  inherits = ["image", "docker-metadata-action"]
+  platforms = [
+    "linux/arm/v7"
+  ]
+  cache-from = [
+    "type=local,src=/var/cache/buildx",
+    "type=gha"
+  ]
+  cache-to = [
+    "type=local,dest=/var/cache/buildx,mode=max",
+    "type=gha,mode=max"
+  ]
+}
+
 target "test" {
   inherits = ["image"]
   target = "test-builder"

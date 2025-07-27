@@ -47,6 +47,15 @@ jobs:
             type=semver,pattern={{major}}.{{minor}}
             type=raw,value=latest,enable={{is_default_branch}}
 
+      - name: Cache Docker layers
+        uses: actions/cache@v4
+        with:
+          path: /tmp/.buildx-cache
+          key: ${{ runner.os }}-buildx-main-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-buildx-main-
+            ${{ runner.os }}-buildx-
+
       - name: Build and push image (main platforms)
         uses: docker/bake-action@v5
         with:
@@ -56,6 +65,14 @@ jobs:
           files: |
             ./docker-bake.hcl
             ${{ steps.meta.outputs.bake-file }}
+
+      - name: Move cache
+        run: |
+          rm -rf /tmp/.buildx-cache
+          mv /tmp/.buildx-cache-new /tmp/.buildx-cache
+        env:
+          BUILDX_CACHE_FROM: type=local,src=/tmp/.buildx-cache
+          BUILDX_CACHE_TO: type=local,dest=/tmp/.buildx-cache-new,mode=max
 
   build-armv7-selfhosted:
     runs-on: [self-hosted, v7]
@@ -94,12 +111,17 @@ jobs:
             type=semver,pattern={{major}}.{{minor}}
             type=raw,value=latest,enable={{is_default_branch}}
 
+      - name: Ensure cache directory exists
+        run: |
+          sudo mkdir -p /var/cache/buildx
+          sudo chown $USER:$USER /var/cache/buildx
+
       - name: Build and push image (armv7)
         id: build
         uses: docker/bake-action@v5
         with:
           workdir: ./software/containers/telescope_api
-          targets: image-armv7
+          targets: image-armv7-local
           push: true
           files: |
             ./docker-bake.hcl
@@ -144,6 +166,15 @@ jobs:
             type=semver,pattern={{major}}.{{minor}}
             type=raw,value=latest,enable={{is_default_branch}}
 
+      - name: Cache Docker layers
+        uses: actions/cache@v4
+        with:
+          path: /tmp/.buildx-cache
+          key: ${{ runner.os }}-buildx-armv7-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-buildx-armv7-
+            ${{ runner.os }}-buildx-
+
       - name: Build and push image (armv7 fallback)
         uses: docker/bake-action@v5
         with:
@@ -153,3 +184,11 @@ jobs:
           files: |
             ./docker-bake.hcl
             ${{ steps.meta.outputs.bake-file }}
+
+      - name: Move cache
+        run: |
+          rm -rf /tmp/.buildx-cache
+          mv /tmp/.buildx-cache-new /tmp/.buildx-cache
+        env:
+          BUILDX_CACHE_FROM: type=local,src=/tmp/.buildx-cache
+          BUILDX_CACHE_TO: type=local,dest=/tmp/.buildx-cache-new,mode=max
