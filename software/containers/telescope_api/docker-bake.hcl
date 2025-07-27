@@ -21,9 +21,6 @@ target "image" {
   output = ["type=image,compression=zstd,compression-level=3,force-compression=true"]
   args = {
     BUILDKIT_INLINE_CACHE = 1
-    MAKEFLAGS = "-j$(nproc)"
-    CARGO_BUILD_JOBS = "$(nproc)"
-    NODE_OPTIONS = "--max-old-space-size=4096"
   }
 }
 
@@ -94,10 +91,6 @@ target "image-armv7-local" {
   output = ["type=image,compression=zstd,compression-level=3,force-compression=true"]
   args = {
     BUILDKIT_INLINE_CACHE = 1
-    MAKEFLAGS = "-j$(nproc)"
-    CARGO_BUILD_JOBS = "$(nproc)"
-    NODE_OPTIONS = "--max-old-space-size=2048"
-    CPUS = "$(nproc)"
   }
 }
 

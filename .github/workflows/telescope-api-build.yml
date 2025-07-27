@@ -70,13 +70,7 @@ jobs:
             ./docker-bake.hcl
             ${{ steps.meta.outputs.bake-file }}
 
-      - name: Move cache
-        run: |
-          rm -rf /tmp/.buildx-cache
-          mv /tmp/.buildx-cache-new /tmp/.buildx-cache
-        env:
-          BUILDX_CACHE_FROM: type=local,src=/tmp/.buildx-cache
-          BUILDX_CACHE_TO: type=local,dest=/tmp/.buildx-cache-new,mode=max
+
 
   build-armv7-selfhosted:
     runs-on: [self-hosted, v7]
@@ -209,13 +203,7 @@ jobs:
             ./docker-bake.hcl
             ${{ steps.meta.outputs.bake-file }}
 
-      - name: Move cache
-        run: |
-          rm -rf /tmp/.buildx-cache
-          mv /tmp/.buildx-cache-new /tmp/.buildx-cache
-        env:
-          BUILDX_CACHE_FROM: type=local,src=/tmp/.buildx-cache
-          BUILDX_CACHE_TO: type=local,dest=/tmp/.buildx-cache-new,mode=max
+
 
   create-manifest:
     runs-on: ubuntu-latest
