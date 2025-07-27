@@ -47,6 +47,25 @@ target "image-cross" {
   cache-to = ["type=gha,mode=max"]
 }
 
+target "image-main" {
+  inherits = ["image", "docker-metadata-action"]
+  platforms = [
+    "linux/amd64",
+    "linux/arm64"
+  ]
+  cache-from = ["type=gha"]
+  cache-to = ["type=gha,mode=max"]
+}
+
+target "image-armv7" {
+  inherits = ["image", "docker-metadata-action"]
+  platforms = [
+    "linux/arm/v7"
+  ]
+  cache-from = ["type=gha"]
+  cache-to = ["type=gha,mode=max"]
+}
+
 target "test" {
   inherits = ["image"]
   target = "test-builder"
