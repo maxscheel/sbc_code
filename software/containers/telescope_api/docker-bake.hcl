@@ -18,12 +18,20 @@ group "all" {
 target "image" {
   context = "."
   dockerfile = "Dockerfile"
+  output = ["type=image,compression=zstd,compression-level=3,force-compression=true"]
+  args = {
+    BUILDKIT_INLINE_CACHE = 1
+    MAKEFLAGS = "-j$(nproc)"
+    CARGO_BUILD_JOBS = "$(nproc)"
+    NODE_OPTIONS = "--max-old-space-size=4096"
+  }
 }
 
 target "image-local" {
   inherits = ["image"]
   tags = ["${DEFAULT_TAG}"]
   platforms = ["linux/amd64"]
+  output = ["type=image,compression=zstd,compression-level=3,force-compression=true"]
 }
 
 target "image-all" {
@@ -34,6 +42,7 @@ target "image-all" {
     "linux/arm/v7",
     "linux/arm64"
   ]
+  output = ["type=image,compression=zstd,compression-level=3,force-compression=true"]
 }
 
 target "image-cross" {
@@ -43,8 +52,9 @@ target "image-cross" {
     "linux/arm/v7",
     "linux/arm64"
   ]
-  cache-from = ["type=gha"]
-  cache-to = ["type=gha,mode=max"]
+  cache-from = ["type=gha,compression=zstd"]
+  cache-to = ["type=gha,mode=max,compression=zstd"]
+  output = ["type=image,compression=zstd,compression-level=3,force-compression=true"]
 }
 
 target "image-main" {
@@ -53,8 +63,9 @@ target "image-main" {
     "linux/amd64",
     "linux/arm64"
   ]
-  cache-from = ["type=gha"]
-  cache-to = ["type=gha,mode=max"]
+  cache-from = ["type=gha,compression=zstd"]
+  cache-to = ["type=gha,mode=max,compression=zstd"]
+  output = ["type=image,compression=zstd,compression-level=3,force-compression=true"]
 }
 
 target "image-armv7" {
@@ -62,8 +73,9 @@ target "image-armv7" {
   platforms = [
     "linux/arm/v7"
   ]
-  cache-from = ["type=gha"]
-  cache-to = ["type=gha,mode=max"]
+  cache-from = ["type=gha,compression=zstd"]
+  cache-to = ["type=gha,mode=max,compression=zstd"]
+  output = ["type=image,compression=zstd,compression-level=3,force-compression=true"]
 }
 
 target "image-armv7-local" {
@@ -72,14 +84,23 @@ target "image-armv7-local" {
     "linux/arm/v7"
   ]
   cache-from = [
-    "type=local,src=/var/cache/buildx",
-    "type=gha"
+    "type=local,src=/var/cache/buildx,compression=zstd",
+    "type=gha,compression=zstd"
   ]
   cache-to = [
-    "type=local,dest=/var/cache/buildx,mode=max",
-    "type=gha,mode=max"
+    "type=local,dest=/var/cache/buildx,mode=max,compression=zstd",
+    "type=gha,mode=max,compression=zstd"
   ]
+  output = ["type=image,compression=zstd,compression-level=3,force-compression=true"]
+  args = {
+    BUILDKIT_INLINE_CACHE = 1
+    MAKEFLAGS = "-j$(nproc)"
+    CARGO_BUILD_JOBS = "$(nproc)"
+    NODE_OPTIONS = "--max-old-space-size=2048"
+    CPUS = "$(nproc)"
+  }
 }
+
 
 target "test" {
   inherits = ["image"]
