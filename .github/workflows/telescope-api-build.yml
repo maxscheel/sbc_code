@@ -54,10 +54,9 @@ jobs:
         uses: actions/cache@v4
         with:
           path: /tmp/.buildx-cache
-          key: ${{ runner.os }}-buildx-main-${{ github.sha }}
+          key: ${{ runner.os }}-buildx-main-${{ hashFiles('software/containers/telescope_api/**') }}
           restore-keys: |
             ${{ runner.os }}-buildx-main-
-            ${{ runner.os }}-buildx-
         env:
           CACHE_COMPRESSION: zstd
 
@@ -70,6 +69,11 @@ jobs:
           files: |
             ./docker-bake.hcl
             ${{ steps.meta.outputs.bake-file }}
+          set: |
+            *.cache-from=type=gha
+            *.cache-to=type=gha,mode=max
+            *.cache-from=type=registry,ref=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:cache-main
+            *.cache-to=type=registry,ref=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:cache-main,mode=max
 
 
 
@@ -136,6 +140,8 @@ jobs:
             *.args.CPUS=${{ steps.cpu-count.outputs.count }}
             *.args.MAKEFLAGS=-j${{ steps.cpu-count.outputs.count }}
             *.args.CARGO_BUILD_JOBS=${{ steps.cpu-count.outputs.count }}
+            *.cache-from=type=registry,ref=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:cache-armv7
+            *.cache-to=type=registry,ref=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:cache-armv7,mode=max
         env:
           BUILDX_CONFIG_INLINE: |
             [worker.oci]
@@ -189,10 +195,9 @@ jobs:
         uses: actions/cache@v4
         with:
           path: /tmp/.buildx-cache
-          key: ${{ runner.os }}-buildx-armv7-${{ github.sha }}
+          key: ${{ runner.os }}-buildx-armv7-${{ hashFiles('software/containers/telescope_api/**') }}
           restore-keys: |
             ${{ runner.os }}-buildx-armv7-
-            ${{ runner.os }}-buildx-
         env:
           CACHE_COMPRESSION: zstd
 
@@ -205,6 +210,11 @@ jobs:
           files: |
             ./docker-bake.hcl
             ${{ steps.meta.outputs.bake-file }}
+          set: |
+            *.cache-from=type=gha
+            *.cache-to=type=gha,mode=max
+            *.cache-from=type=registry,ref=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:cache-armv7
+            *.cache-to=type=registry,ref=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:cache-armv7,mode=max
 
 
 
